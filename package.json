@@ -11,6 +11,7 @@
   "dependencies": {
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-navigation-menu": "^1.2.13",
+    "geist": "^1.4.2",
     "hypha-rpc": "^0.20.55",
     "next": "15.3.3",
     "radix-ui": "^1.4.2",

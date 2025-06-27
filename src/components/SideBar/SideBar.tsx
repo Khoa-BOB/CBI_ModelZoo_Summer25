@@ -70,7 +70,6 @@ export default function SideBar() {
         group-hover:items-start
         group-hover:px-4
         overflow-hidden
-        items-start
       `}
     >
       <NavigationMenu.List className="flex flex-col gap-2 w-full">
