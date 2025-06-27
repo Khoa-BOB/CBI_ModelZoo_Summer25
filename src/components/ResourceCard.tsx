@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { ArtifactInfo } from '@/types/artifact';
 import { DownloadIcon, EyeOpenIcon, CalendarIcon  } from '@radix-ui/react-icons';
 import { resolveHyphaUrl } from '@/utils/urlHelpers';
+import { useRouter } from 'next/navigation';
 
 interface ArtifactCardProps {
   artifact: ArtifactInfo;
@@ -33,6 +34,7 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
   const [showTagButtons, setShowTagButtons] = useState(false);
   const [isTagHover, setIsTagHover] = useState(false);
 
+  const router = useRouter();
   // const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Store covers URL
@@ -72,6 +74,14 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
     }
   }, [manifest.tags]);
 
+  const handleClick = (e: React.MouseEvent) => {
+    // Only navigate if the click target is the card itself, not children
+    // if (e.target === e.currentTarget) {
+      const id = artifact.id.split('/').pop();
+      router.push(`resources/${id}`)
+    // }
+  };
+
   function scrollTags(dir: 'left' | 'right') {
     if (tagContainerRef.current) {
       tagContainerRef.current.scrollBy({
@@ -84,6 +94,7 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
   return (
     <div
       className={`flex flex-col justify-between rounded-xl shadow-lg p-4 ${bgColor} border hover:border-blue-400 transition cursor-pointer h-full min-h-[200px]`}
+      onClick={handleClick}
     >
       {/*Media section */}
       <div style={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden' }}>
