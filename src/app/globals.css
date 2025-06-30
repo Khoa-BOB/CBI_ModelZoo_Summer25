@@ -1,27 +1,58 @@
 @import "tailwindcss";
 
+/* ———————————————— */
+/* 1. Light theme (default) */
+/* ———————————————— */
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a; /* Make text visible on white background */
-  --font-sans: var(--font-geist-sans, sans-serif);
-  --font-mono: var(--font-geist-mono, monospace);
+  --background:  #FFFFFF;   /* White */
+  --foreground:  #333333;   /* Dark slate for crisp text */
+  --accent:      #C10F3A;   /* St. Jude Red :contentReference[oaicite:0]{index=0} */
+  --primary:     #1874DC;   /* St. Jude Cloud Blue :contentReference[oaicite:1]{index=1} */
+  --secondary:   #002856;   /* St. Jude Cloud Navy :contentReference[oaicite:2]{index=2} */
+  --chart-background: #f8fafc;  /* very light slate */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #ffffff;
-    --foreground: #ededed;
-  }
+/* ———————————————————— */
+/* 2. Dark theme (on <html class="dark">) */
+/* ———————————————————— */
+html.dark {
+  --background:  #1E3A8A;   /* Navy  */
+  --foreground:  #F2F2F2;   /* Off-white for legibility */
+  --accent:      #C10F3A;   /* Keep CTAs in St. Jude Red */
+  --primary:     #1874DC;   /* Cloud Blue still available */
+  --secondary:   #911938;   /* St. Jude Red Dark (for deeper accents) :contentReference[oaicite:3]{index=3} */
+  --chart-background: #1e293b;  /* slate-800 */
 }
 
+/* ———————————————————— */
+/* 3. Apply them site-wide */
+/* ———————————————————— */
 body {
   background: var(--background);
-  
+  color:      var(--foreground);
   font-family: var(--font-sans);
 }
 
-/*Card design*/
+/* Example for links/buttons (calls-to-action) */
+a, button {
+  color: var(--accent);
+}
+/* @layer components {
+  button {
+    color: var(--color-yellow-300) !important;
+  }
+  html.dark button {
+    color: white !important;
+  }
+} */
 
+
+/* You can also use var(--primary)/var(--secondary) in your Tailwind config */
+/* e.g. bg-[var(--primary)] text-[var(--secondary)] ... */
+
+/* ———————————————————— */
+/* 4. Utility: hide scrollbars */
+/* ———————————————————— */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -29,6 +60,3 @@ body {
   -ms-overflow-style: none;  /* IE + Edge */
   scrollbar-width: none;     /* Firefox */
 }
-
-/*Title scroll*/
-

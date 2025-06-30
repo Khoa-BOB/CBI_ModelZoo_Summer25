@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useRef, useEffect, useState } from 'react';
 import { ArtifactInfo } from '@/types/artifact';
-import { DownloadIcon, EyeOpenIcon, CalendarIcon  } from '@radix-ui/react-icons';
+import { DownloadIcon, EyeOpenIcon, CalendarIcon } from '@radix-ui/react-icons';
 import { resolveHyphaUrl } from '@/utils/urlHelpers';
 import { useRouter } from 'next/navigation';
 
@@ -9,171 +11,133 @@ interface ArtifactCardProps {
 }
 
 const CARD_COLORS = [
-  'bg-red-50',
-  'bg-blue-50',
-  'bg-green-50',
-  'bg-yellow-50',
-  'bg-purple-50',
-  'bg-pink-50',
-  'bg-indigo-50',
-  'bg-orange-50'
+  'var(--accent)/10',
+  'var(--primary)/10',
+  'var(--secondary)/10',
+  'var(--accent)/5',
 ];
 
 export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
+  // 1) Guard against missing manifest
+  if (!artifact.manifest) {
+    return (
+      <div className="p-4 bg-red-100 text-red-800 rounded">
+        Artifact data is unavailable.
+      </div>
+    );
+  }
+
+  // 2) Destructure and normalize tags
   const { manifest, download_count, view_count, created_at } = artifact;
+  const tags = manifest.tags ?? [];
   const createdDate = new Date(created_at).toLocaleDateString();
 
-  const [bgColor, setBgColor] = useState('bg-white');
+  const router = useRouter();
+  const [bgColor, setBgColor] = useState<string>('');
 
-  const tagContainerRef = useRef<HTMLDivElement>(null);
+  // Refs & state for scrolling title & tags
   const titleContainerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
-
+  const tagContainerRef = useRef<HTMLDivElement>(null);
   const [scrollDistance, setScrollDistance] = useState(0);
   const [shouldScrollTitle, setShouldScrollTitle] = useState(false);
   const [showTagButtons, setShowTagButtons] = useState(false);
   const [isTagHover, setIsTagHover] = useState(false);
 
-  const router = useRouter();
-  // const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  // Store covers URL
-  const covers = artifact.manifest.covers || [];
-  
-  // // Get the resolved cover URL for the current index
-  // const getCurrentCoverUrl = () => {
-  //   if (covers.length === 0) return '';
-  //   return resolveHyphaUrl(covers[currentImageIndex], artifact.id);
-  // };
-
+  // 3) Pick a tinted accent background on mount
   useEffect(() => {
-    // Set random background color
-    const random = CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)];
-    setBgColor(random);
+    const color = CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)];
+    setBgColor(`bg-[${color}]`);
   }, []);
 
+  // 4) Detect overflowing title text
   useEffect(() => {
-    // Check if title overflows
-    if (titleContainerRef.current && titleRef.current) {
-      const containerWidth = titleContainerRef.current.offsetWidth;
-      const textWidth = titleRef.current.scrollWidth;
-      if (textWidth > containerWidth) {
-        setScrollDistance(containerWidth - textWidth);
+    const container = titleContainerRef.current;
+    const text = titleRef.current;
+    if (container && text) {
+      const overflow = text.scrollWidth - container.clientWidth;
+      if (overflow > 0) {
+        setScrollDistance(-overflow);
         setShouldScrollTitle(true);
-      } else {
-        setShouldScrollTitle(false);
       }
     }
   }, [manifest.name]);
 
+  // 5) Detect overflowing tags
   useEffect(() => {
-    // Check if tags overflow
-    if (tagContainerRef.current) {
-      const { scrollWidth, clientWidth } = tagContainerRef.current;
-      setShowTagButtons(scrollWidth > clientWidth);
+    const tl = tagContainerRef.current;
+    if (tl) {
+      setShowTagButtons(tl.scrollWidth > tl.clientWidth);
     }
-  }, [manifest.tags]);
+  }, [tags]);
 
-  const handleClick = (e: React.MouseEvent) => {
-    // Only navigate if the click target is the card itself, not children
-    // if (e.target === e.currentTarget) {
-      const id = artifact.id.split('/').pop();
-      router.push(`resources/${id}`)
-    // }
+  const handleClick = () => {
+    const id = artifact.id.split('/').pop();
+    router.push(`resources/${id}`);
   };
 
-  function scrollTags(dir: 'left' | 'right') {
-    if (tagContainerRef.current) {
-      tagContainerRef.current.scrollBy({
-        left: dir === 'left' ? -100 : 100,
-        behavior: 'smooth'
-      });
-    }
-  }
+  const scrollTags = (dir: 'left' | 'right') => {
+    tagContainerRef.current?.scrollBy({
+      left: dir === 'left' ? -80 : 80,
+      behavior: 'smooth'
+    });
+  };
 
   return (
     <div
-      className={`flex flex-col justify-between rounded-xl shadow-lg p-4 ${bgColor} border hover:border-blue-400 transition cursor-pointer h-full min-h-[200px]`}
       onClick={handleClick}
+      className={`
+        flex flex-col justify-between rounded-xl shadow-lg p-4
+        bg-[var(--chart-background)]
+        text-[var(--foreground)]
+        transition-colors duration-300
+        border border-[var(--primary)]/20 hover:border-[var(--accent)]/50
+        cursor-pointer h-full min-h-[200px]
+        ${bgColor}
+      `}
     >
-      {/*Media section */}
-      <div style={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden' }}>
-        {covers.length > 0 ? (
+      {/* Media / Covers */}
+      <div className="relative w-full aspect-video overflow-hidden rounded-md mb-4">
+        {manifest.covers?.length ? (
           <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              overflowX: 'auto',
-              whiteSpace: 'nowrap',
-              scrollSnapType: 'x mandatory'
-            }}
+            className="absolute inset-0 flex overflow-x-auto whitespace-nowrap"
+            style={{ scrollSnapType: 'x mandatory' }}
           >
-            {covers.map((coverUrl, index) => (
+            {manifest.covers.map((url, idx) => (
               <img
-                key={index}
-                src={resolveHyphaUrl(coverUrl, artifact.id)}
-                alt={`${artifact.manifest.name} cover ${index + 1}`}
-                style={{
-                  display: 'inline-block',
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-                  cursor: 'pointer',
-                  scrollSnapAlign: 'center'
-                }}
+                key={idx}
+                src={resolveHyphaUrl(url, artifact.id)}
+                alt={`${manifest.name} cover ${idx + 1}`}
+                className="inline-block w-full h-full object-cover scroll-snap-align-center"
               />
             ))}
           </div>
         ) : (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#f5f5f5',
-              borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
-            }}
-          >
-            {artifact.manifest.icon ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-[var(--background)]">
+            {manifest.icon ? (
               <img
-                src={artifact.manifest.icon}
-                alt={artifact.manifest.name}
-                style={{
-                  width: '40%',
-                  height: '40%',
-                  objectFit: 'contain'
-                }}
+                src={manifest.icon}
+                alt={`${manifest.name} icon`}
+                className="w-2/5 h-2/5 object-contain"
               />
-            ) : artifact.manifest.id_emoji ? (
-              <span style={{ fontSize: '3rem' }}>{artifact.manifest.id_emoji}</span>
+            ) : manifest.id_emoji ? (
+              <span className="text-4xl">{manifest.id_emoji}</span>
             ) : (
-              <div
-                style={{
-                  width: '4rem',
-                  height: '4rem',
-                  backgroundColor: '#e0e0e0',
-                  borderRadius: '50%'
-                }}
-              />
+              <div className="w-16 h-16 bg-[var(--secondary)] rounded-full" />
             )}
           </div>
         )}
       </div>
 
-      {/*Contet section */}
+      {/* Content */}
       <div>
         <div className="flex items-center gap-2 mb-2">
           {manifest.icon ? (
-            <img src={manifest.icon} alt="icon" className="w-10 h-10 rounded" />
+            <img
+              src={manifest.icon}
+              alt=""
+              className="w-10 h-10 rounded"
+            />
           ) : (
             <span className="text-3xl">{manifest.id_emoji || '📦'}</span>
           )}
@@ -181,11 +145,11 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
           <div className="min-w-0">
             <div
               ref={titleContainerRef}
-              className="relative overflow-hidden max-w-full"
+              className="relative overflow-hidden"
             >
               <div
                 ref={titleRef}
-                className="text-sm font-semibold whitespace-nowrap inline-block"
+                className="whitespace-nowrap inline-block font-semibold"
                 onMouseEnter={() => {
                   if (shouldScrollTitle && titleRef.current) {
                     titleRef.current.style.transition = 'transform 4s linear';
@@ -195,24 +159,25 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
                 onMouseLeave={() => {
                   if (shouldScrollTitle && titleRef.current) {
                     titleRef.current.style.transition = 'transform 0.5s ease-out';
-                    titleRef.current.style.transform = `translateX(0)`;
+                    titleRef.current.style.transform = 'translateX(0)';
                   }
                 }}
               >
                 {manifest.name}
               </div>
             </div>
-            <p className="text-xs text-gray-500 truncate">{manifest.type}</p>
+            <p className="text-sm opacity-80">{manifest.type}</p>
           </div>
         </div>
 
-        <p className="text-xs text-gray-600 line-clamp-3">
+        <p className="text-sm line-clamp-3 opacity-90 mb-2">
           {manifest.description || 'No description provided.'}
         </p>
 
-        {manifest.tags && manifest.tags.length > 0 && (
+        {/* Tags */}
+        {tags.length > 0 && (
           <div
-            className="relative mt-2"
+            className="relative mb-2"
             onMouseEnter={() => setIsTagHover(true)}
             onMouseLeave={() => setIsTagHover(false)}
           >
@@ -220,27 +185,29 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
               <>
                 <button
                   onClick={() => scrollTags('left')}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/70 p-1 rounded-full shadow"
                 >
                   ◀
                 </button>
                 <button
                   onClick={() => scrollTags('right')}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/70 p-1 rounded-full shadow"
                 >
                   ▶
                 </button>
               </>
             )}
-
             <div
               ref={tagContainerRef}
-              className="flex overflow-x-auto gap-1 hide-scrollbar"
+              className="flex gap-2 overflow-x-auto hide-scrollbar px-1"
             >
-              {manifest.tags.map((tag) => (
+              {tags.map(tag => (
                 <span
                   key={tag}
-                  className="flex-shrink-0 bg-blue-100 text-blue-700 text-xs font-medium px-2 py-0.5 rounded whitespace-nowrap"
+                  className="
+                    flex-shrink-0 px-2 py-0.5 text-xs font-medium rounded-full
+                    bg-[var(--accent)]/20 text-[var(--accent)]
+                  "
                 >
                   {tag}
                 </span>
@@ -250,10 +217,17 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
         )}
       </div>
 
-      <div className="flex justify-between text-xs text-gray-500 mt-2 pt-2 border-t">
-        <div><DownloadIcon/> {download_count}</div>
-        <div><EyeOpenIcon/> {view_count}</div>
-        <div><CalendarIcon/> {createdDate}</div>
+      {/* Footer */}
+      <div className="flex justify-between items-center text-xs opacity-70 pt-2 border-t border-[var(--primary)]/20">
+        <div className="flex items-center gap-1">
+          <DownloadIcon className="w-4 h-4" /> {download_count}
+        </div>
+        <div className="flex items-center gap-1">
+          <EyeOpenIcon className="w-4 h-4" /> {view_count}
+        </div>
+        <div className="flex items-center gap-1">
+          <CalendarIcon className="w-4 h-4" /> {createdDate}
+        </div>
       </div>
     </div>
   );

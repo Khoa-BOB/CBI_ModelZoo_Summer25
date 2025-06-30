@@ -6,7 +6,7 @@ import { useHyphaStore } from '@/store/hyphaStore';
 import ReactMarkdown from 'react-markdown';
 import { resolveHyphaUrl } from '@/utils/urlHelpers';
 import { ArtifactInfo } from '@/types/artifact';
-import { FileIcon, DownloadIcon, Link1Icon, ClockIcon, Cross2Icon } from '@radix-ui/react-icons';
+import { FileIcon, DownloadIcon, Link1Icon, ClockIcon } from '@radix-ui/react-icons';
 
 export default function ResourceDetail() {
   const { id, version } = useParams<{ id: string; version?: string }>();
@@ -90,149 +90,60 @@ export default function ResourceDetail() {
 
   if (isLoading) return (
     <div className="flex flex-col justify-center items-center w-full min-h-[calc(100vh-200px)]">
-      <div className="animate-spin h-10 w-10 border-4 border-[var(--secondary)] border-t-[var(--accent)] rounded-full" />
-      <p className="mt-4 text-lg text-[var(--secondary)]">Loading Artifact Details...</p>
+      <div className="animate-spin h-10 w-10 border-4 border-gray-300 border-t-blue-600 rounded-full" />
+      <p className="mt-4 text-lg text-gray-600">Loading Artifact Details...</p>
     </div>
   );
 
-  if (!selectedResource) return <div className="text-[var(--foreground)]">Artifact not found</div>;
+  if (!selectedResource) return <div>Artifact not found</div>;
 
   const { manifest } = selectedResource as ArtifactInfo;
   const slideCount = safeCovers.length;
   const radius = 300;
 
   return (
-    <div className="px-4 py-8 space-y-8 text-[var(--foreground)]">
-      {/* ─── HERO PANEL (HEADER + DESCRIPTION + ACTIONS) ───────────────────────── */}
-<div
-  className="
-    bg-[var(--background)]               /* white in light */
-    dark:bg-[var(--chart-background)]    /* slate panel in dark */
-    border-l-4 border-[var(--accent)]    /* bold accent stripe on left */
-    rounded-2xl shadow-md p-6
-    grid grid-cols-1 md:grid-cols-3 gap-6
-  "
->
-  {/* LEFT: Icon + Title + ID + Version */}
-  <div className="flex items-start gap-4 md:col-span-2">
-    <div className="text-[var(--accent)] text-4xl">{manifest.id_emoji}</div>
-    <div className="flex-1 space-y-1">
-      <h1 className="text-3xl font-bold text-[var(--foreground)]">
-        {manifest.name}
-      </h1>
-      <div className="flex items-center gap-2 text-sm text-[var(--secondary)]">
-        <span className="font-medium">ID:</span>
-        <code className="bg-[var(--chart-background)] dark:bg-[var(--background)] px-2 py-0.5 rounded select-all text-[var(--foreground)]">
-          {selectedResource.id.split('/').pop()}
-        </code>
-        <button
-          onClick={handleCopyId}
-          className="p-1 hover:bg-[var(--chart-background)] dark:hover:bg-[var(--background)] rounded transition"
-          title="Copy ID"
-        >
-          <FileIcon className="w-5 h-5 text-[var(--primary)]" />
-        </button>
-        {showCopied && <span className="text-[var(--accent)]">Copied!</span>}
-      </div>
-      {latestVersion && (
-        <div className="
-          inline-flex items-center gap-1
-          bg-[var(--accent)]/10 text-[var(--accent)]
-          px-3 py-1 rounded-full text-sm
-        ">
-          <ClockIcon className="w-4 h-4" />
-          {latestVersion.version}
+    <div className="px-4 py-8 space-y-8">
+      {/* HEADER */}
+      <header className="space-y-4">
+        <h1 className="text-3xl font-semibold flex items-center gap-2">
+          <span className="text-2xl">{manifest.id_emoji}</span>
+          {manifest.name}
+        </h1>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span className="font-medium">ID:</span>
+          <code className="bg-gray-100 px-2 py-0.5 rounded select-all">{selectedResource.id.split('/').pop()}</code>
+          <button onClick={handleCopyId} title="Copy ID" className="p-1 hover:bg-gray-200 rounded">
+            <FileIcon className="w-4 h-4" />
+          </button>
+          {showCopied && <span className="text-green-600 text-sm">Copied!</span>}
         </div>
-      )}
-    </div>
-  </div>
+      </header>
 
-  {/* MIDDLE: Description (full width on mobile) */}
-  <div className="md:col-span-3 lg:col-span-2 text-[var(--foreground)]/90">
-    <p className="text-base">{manifest.description}</p>
-  </div>
+      {/* DESCRIPTION & ACTIONS */}
+      <section className="space-y-4">
+        <p className="text-base text-gray-700">{manifest.description}</p>
+        <div className="flex flex-wrap gap-3">
+          <button onClick={handleDownload} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+            <DownloadIcon className="w-4 h-4" /> Download
+          </button>
+          <button onClick={handleViewSource} className="flex items-center gap-2 border-2 border-blue-600 text-blue-600 px-4 py-2 rounded-lg shadow-sm hover:bg-blue-50 transition">
+            <Link1Icon className="w-4 h-4" /> View Source
+          </button>
+          {manifest.type === 'model' && (
+            <>
+              <button className="px-4 py-2 bg-gray-200 rounded-lg shadow-sm hover:bg-gray-300 transition">Model Tester</button>
+              <button className="px-4 py-2 bg-gray-200 rounded-lg shadow-sm hover:bg-gray-300 transition">Model Runner</button>
+            </>
+          )}
+          {latestVersion && (
+            <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+              <ClockIcon className="w-4 h-4" /> Version: {latestVersion.version}
+            </div>
+          )}
+        </div>
+      </section>
 
-  {/* RIGHT: Actions */}
-  {/* ─── ACTION BUTTONS (OVERRIDE GLOBAL COLOR) ───────────────────────────────── */}
-<div className="flex flex-wrap gap-4">
-  {/* Download – solid primary bg, black in light / white in dark */}
-  <button
-    onClick={handleDownload}
-    className="
-      inline-flex items-center gap-2
-      bg-[var(--primary)]
-      !text-black dark:!text-white    /* ← override the global accent rule */
-      px-6 py-2
-      rounded-full shadow
-      hover:bg-[var(--primary)]/90
-      transition
-    "
-  >
-    <DownloadIcon className="w-5 h-5 !text-black dark:!text-white" />
-    Download
-  </button>
-
-  {/* View Source – solid secondary bg, black in light / white in dark */}
-  <button
-    onClick={handleViewSource}
-    className="
-      inline-flex items-center gap-2
-      bg-[var(--secondary)]
-      !text-black dark:!text-white
-      px-6 py-2
-      rounded-full shadow-sm
-      hover:bg-[var(--secondary)]/90
-      transition
-    "
-  >
-    <Link1Icon className="w-5 h-5 !text-black dark:!text-white" />
-    View Source
-  </button>
-
-  {/* Model Tester/Runner – neutral chart-bg, black in light / white in dark */}
-  {manifest.type === 'model' && (
-    <>
-      <button
-        className="
-          px-6 py-2
-          bg-[var(--primary)]
-          !text-black dark:!text-white
-          rounded-full shadow-sm
-          hover:bg-[var(--primary)]/90
-          transition
-        "
-      >
-        Model Tester
-      </button>
-      <button
-        className="
-          px-6 py-2
-          bg-[var(--secondary)]
-          !text-black dark:!text-white
-          rounded-full shadow-sm
-          hover:bg-[var(--secondary)]/90
-          transition
-        "
-      >
-        Model Runner
-      </button>
-    </>
-  )}
-</div>
-
-
-
-
-
-
-
-</div>
-
-
-
-
-
-{/* 3D CAROUSEL */}
+      {/* 3D CAROUSEL */}
       {slideCount > 0 && (
         <section className="relative max-w-3xl mx-auto overflow-hidden h-96">
           <div
@@ -267,25 +178,16 @@ export default function ResourceDetail() {
 
       {/* DOCUMENTATION */}
       {documentation && (
-        <section className="bg-[var(--background)] dark:bg-[var(--chart-background)] rounded-2xl shadow-lg p-6">
-          <div className="prose prose-[var(--foreground)] dark:prose-invert lg:prose-xl">
-            <ReactMarkdown>
-              {documentation}
-            </ReactMarkdown>
-          </div>
+        <section className="prose lg:prose-xl">
+          <ReactMarkdown>{documentation}</ReactMarkdown>
         </section>
       )}
 
       {/* RDF DIALOG */}
       {isRdfDialogOpen && (
-        <dialog open className="fixed inset-0 m-auto w-11/12 max-w-lg p-6 bg-[var(--background)] dark:bg-[var(--chart-background)] rounded-2xl shadow-2xl">
-          <button onClick={() => setIsRdfDialogOpen(false)}
-                  className="absolute top-4 right-4 p-1 rounded-full hover:bg-[var(--chart-background)] transition">
-            <Cross2Icon className="w-5 h-5 text-[var(--secondary)]" />
-          </button>
-          <pre className="whitespace-pre-wrap text-sm text-[var(--foreground)] max-h-[60vh] overflow-auto">
-            {rdfContent}
-          </pre>
+        <dialog open className="p-6 rounded-lg shadow-2xl w-11/12 max-w-lg">
+          <pre className="whitespace-pre-wrap text-sm">{rdfContent}</pre>
+          <button onClick={() => setIsRdfDialogOpen(false)} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg">Close</button>
         </dialog>
       )}
     </div>
