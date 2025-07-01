@@ -194,23 +194,35 @@ export const ResroucesGrid: React.FC<ResourceGridProps> = ({type}) =>{
            {loading && <LoadingOverlay/>}
           
           <div className="max-w-3xl mx-auto w-full">
-            <div className="flex items-center gap-2">
-              <div className="flex-1 min-w-0">
-                <SearchBar
-                  value={searchQuery}
-                  onSearchChange={handleSearchChange}
-                  selectedTags={selectedTags}
-                  onRemoveTag={tag => setSelectedTags(prev => prev.filter(t => t !== tag))}
-                />
-              </div>
-              <div className="flex-none">
-                <TagSelection 
-                  onTagSelect={handleTagSelect}
-                  selectedTags={selectedTags}
-                />
-              </div>
-            </div>
-          </div>
+  <div
+    className="
+      rounded-xl shadow-md 
+      border border-[var(--primary)]
+      bg-[var(--chart-background)] dark:bg-[var(--background)]
+      transition-colors duration-300
+    "
+  >
+    <div className="flex items-center gap-2 px-4 py-3">
+      <div className="flex-1 min-w-0">
+        <SearchBar
+          value={searchQuery}
+          onSearchChange={handleSearchChange}
+          selectedTags={selectedTags}
+          onRemoveTag={(tag) =>
+            setSelectedTags((prev) => prev.filter((t) => t !== tag))
+          }
+        />
+      </div>
+      <div className="flex-none">
+        <TagSelection
+          onTagSelect={handleTagSelect}
+          selectedTags={selectedTags}
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
           {/*Toggle button */}

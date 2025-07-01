@@ -25,7 +25,7 @@ export const ArtifactListRow: React.FC<ArtifactListRowProps> = ({ artifact }) =>
       onClick={handleClick}
       className={`
           flex items-center gap-4 p-4
-          bg-[var(--background)] dark:bg-[var(--chart-background)]
+          bg-[var(--chart-background)]
           border border-[var(--primary)]/20 dark:border-[var(--secondary)]/20
           rounded-lg shadow-sm hover:shadow-md
           hover:border-[var(--accent)]/50
@@ -37,7 +37,7 @@ export const ArtifactListRow: React.FC<ArtifactListRowProps> = ({ artifact }) =>
       <div
         className="
           w-14 h-14 flex-shrink-0 flex items-center justify-center
-          bg-[var(--accent)]/20 dark:bg-[var(--accent)]/30
+          bg-[var(--accent)]/30
           rounded
         "
       >

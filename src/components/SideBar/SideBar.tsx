@@ -63,7 +63,7 @@ export default function SideBar() {
       orientation="vertical"
       className={`
         group flex-none w-20 hover:w-56 transition-all duration-300 ease-out
-        bg-white dark:bg-gray-900 shadow-lg rounded-tr-3xl rounded-br-3xl
+        bg-gray-900 dark:bg-gray-900 shadow-lg rounded-tr-3xl rounded-br-3xl
         flex flex-col items-center py-6 group-hover:items-start group-hover:px-4
         overflow-hidden
       `}
@@ -84,7 +84,7 @@ export default function SideBar() {
                   className="
                     hidden group-hover:inline-block ml-3 whitespace-nowrap
                     opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                    text-gray-900 dark:text-gray-100
+                    text-gray-100 dark:text-gray-100
                   "
                 >
                   {label}
@@ -114,7 +114,7 @@ export default function SideBar() {
                 className="
                   hidden group-hover:inline-block ml-3 whitespace-nowrap
                   opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                  text-gray-900 dark:text-gray-100
+                  text-gray-100 dark:text-gray-100
                 "
               >
                 {resolvedTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}

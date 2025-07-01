@@ -60,10 +60,10 @@ const TagSelection: React.FC<TagSelectionProps> = ({ onTagSelect, selectedTags =
     <div className="relative inline-block text-left">
       <button
         onClick={toggleMenu}
-        className="flex items-center px-3 py-2 border border-gray-300 rounded-md hover:border-gray-500 focus:outline-none"
+        className="flex items-center px-3 py-2 border border-gray-300 shadow rounded-md hover:border-gray-500 focus:outline-none"
         aria-label="Filter by tags"
       >
-        <MixerVerticalIcon className="h-5 w-5 text-gray-600" />
+        <MixerVerticalIcon className="h-5 w-5 " />
       </button>
 
       {open && (
