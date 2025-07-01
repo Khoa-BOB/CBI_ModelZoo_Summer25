@@ -33,8 +33,8 @@ const Link: React.FC<NavLinkProps> = ({
   const combined = [
     "flex items-center justify-center p-3 rounded-lg transition-all",
     isActive
-      ? "bg-gray-900 text-white"
-      : "text-gray-500 hover:bg-gray-100",
+      ? "bg-zinc-500 text-white"
+      : "text-gray-500 hover:bg-stone-500",
     className,
   ]
     .filter(Boolean)
@@ -62,11 +62,12 @@ export default function SideBar() {
     <NavigationMenu.Root
       orientation="vertical"
       className={`
-        group flex-none w-20 hover:w-56 transition-all duration-300 ease-out
+        fixed top-0 left-0 h-screen z-40
+        w-20 group-hover:w-56 transition-all duration-300 ease-out
         bg-gray-900 dark:bg-gray-900 shadow-lg rounded-tr-3xl rounded-br-3xl
         flex flex-col items-center py-6 group-hover:items-start group-hover:px-4
         overflow-hidden
-      `}
+        `}
     >
       <NavigationMenu.List className="flex flex-col gap-2 w-full">
         {([
@@ -101,7 +102,7 @@ export default function SideBar() {
               onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
               className="
                 flex items-center w-full p-3 rounded-lg transition-colors
-                text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800
+                text-gray-500 hover:bg-stone-500 dark:text-gray-400 dark:hover:bg-gray-800
               "
               aria-label="Toggle dark mode"
             >
