@@ -10,12 +10,6 @@ interface ArtifactCardProps {
   artifact: ArtifactInfo;
 }
 
-const CARD_COLORS = [
-  'var(--accent)/10',
-  'var(--primary)/10',
-  'var(--secondary)/10',
-  'var(--accent)/5',
-];
 
 export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
   // 1) Guard against missing manifest
@@ -46,11 +40,6 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
   const [showTagButtons, setShowTagButtons] = useState(false);
   const [isTagHover, setIsTagHover] = useState(false);
 
-  // 3) Pick a tinted accent background on mount
-  useEffect(() => {
-    const color = CARD_COLORS[Math.floor(Math.random() * CARD_COLORS.length)];
-    setBgColor(`bg-[${color}]`);
-  }, []);
 
   // 4) Detect overflowing title text
   useEffect(() => {
@@ -96,7 +85,6 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
         border-2 border-[var(--primary)]/20
         hover:border-[var(--accent)]/50
         cursor-pointer h-full min-h-[200px]
-        ${bgColor}
       `}
     >
       {/* Media / Covers */}
