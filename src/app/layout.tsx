@@ -28,9 +28,14 @@ export default function RootLayout({
       <body className="bg-[var(--background)] text-[var(--foreground)] transition-colors duration-300">
         <noscript>You need to enable JavaScript to run this app</noscript>
         <Providers>
-          <div className="flex min-h-screen">
+          <div className="flex min-h-screen group">
             <SideBar />
-            <div className="flex-1 p-4 transition-all duration-300 ease-out">
+            <div className="
+                flex-1 transition-all duration-300 ease-out
+                pl-25 group-hover:pl-6
+                p-4
+              
+            ">
               <header />
               <main>{children}</main>
             </div>

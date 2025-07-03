@@ -18,7 +18,7 @@ export const tagCategories: Record<string, string[]> = {
     'high-content-imaging',
     'whole-slide-imaging',
   ],
-  dims: ['2d', '3d', '2d-t', '3d-t'],
+  dims: ['2D', '3D', '2d-t', '3d-t'],
   content: [
     'cells',
     'nuclei',

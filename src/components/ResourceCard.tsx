@@ -92,7 +92,8 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
         bg-[var(--chart-background)]
         text-[var(--foreground)]
         transition-colors duration-300
-        border border-[var(--primary)]/20 hover:border-[var(--accent)]/50
+        border-2 border-[var(--primary)]/20
+        hover:border-[var(--accent)]/50
         cursor-pointer h-full min-h-[200px]
         ${bgColor}
       `}
@@ -185,13 +186,13 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
             {showTagButtons && isTagHover && (
               <>
                 <button
-                  onClick={() => scrollTags('left')}
+                  onClick={(e) => {e.stopPropagation(); scrollTags('left');}}
                   className="absolute left-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/70 p-1 rounded-full shadow"
                 >
                   ◀
                 </button>
                 <button
-                  onClick={() => scrollTags('right')}
+                  onClick={(e) => {e.stopPropagation(); scrollTags('right');}}
                   className="absolute right-0 top-1/2 -translate-y-1/2 bg-[var(--background)]/70 p-1 rounded-full shadow"
                 >
                   ▶

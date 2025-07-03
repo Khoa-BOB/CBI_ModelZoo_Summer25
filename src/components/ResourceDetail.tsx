@@ -6,7 +6,8 @@ import { useHyphaStore } from '@/store/hyphaStore';
 import ReactMarkdown from 'react-markdown';
 import { resolveHyphaUrl } from '@/utils/urlHelpers';
 import { ArtifactInfo } from '@/types/artifact';
-import { FileIcon, DownloadIcon, Link1Icon, ClockIcon, Cross2Icon } from '@radix-ui/react-icons';
+import NextLink, { LinkProps as NextLinkProps } from "next/link";
+import { FileIcon, DownloadIcon, Link1Icon, ClockIcon, Cross2Icon, PersonIcon, IdCardIcon, EyeOpenIcon, DrawingPinFilledIcon} from '@radix-ui/react-icons';
 
 export default function ResourceDetail() {
   const { id, version } = useParams<{ id: string; version?: string }>();
@@ -23,6 +24,9 @@ export default function ResourceDetail() {
   const autoAdvanceInterval = 2500;
   const safeCovers = selectedResource?.manifest?.covers ?? [];
   const safeDocumentation = selectedResource?.manifest?.documentation ?? null;
+  const authors = selectedResource?.manifest?.authors ?? [];
+  const cite = selectedResource?.manifest?.cite ?? [];
+  const tags = selectedResource?.manifest?.tags ?? [];
 
   // Load resource
   useEffect(() => {
@@ -101,45 +105,46 @@ export default function ResourceDetail() {
   const slideCount = safeCovers.length;
   const radius = 300;
 
+  const formatDate = (ts: number) =>
+    new Date(ts * 1000).toLocaleString();
+
   return (
     <div className="px-4 py-8 space-y-8 text-[var(--foreground)]">
       {/* ─── HERO PANEL (HEADER + DESCRIPTION + ACTIONS) ───────────────────────── */}
 <div
   className="
-    bg-[var(--background)]               /* white in light */
-    dark:bg-[var(--chart-background)]    /* slate panel in dark */
-    border-l-4 border-[var(--accent)]    /* bold accent stripe on left */
+    bg-[var(--chart-background)]
+    border-l-4 border-rose-500
     rounded-2xl shadow-md p-6
     grid grid-cols-1 md:grid-cols-3 gap-6
   "
 >
   {/* LEFT: Icon + Title + ID + Version */}
   <div className="flex items-start gap-4 md:col-span-2">
-    <div className="text-[var(--accent)] text-4xl">{manifest.id_emoji}</div>
+    <div className="text-blue-500 text-4xl">{manifest.id_emoji}</div>
     <div className="flex-1 space-y-1">
       <h1 className="text-3xl font-bold text-[var(--foreground)]">
         {manifest.name}
       </h1>
-      <div className="flex items-center gap-2 text-sm text-[var(--secondary)]">
+      <div className="flex items-center gap-2 text-sm text-[var(--foreground)">
         <span className="font-medium">ID:</span>
-        <code className="bg-[var(--chart-background)] dark:bg-[var(--background)] px-2 py-0.5 rounded select-all text-[var(--foreground)]">
+        <code className="bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded select-all text-gray-900 dark:text-gray-100">
           {selectedResource.id.split('/').pop()}
         </code>
         <button
           onClick={handleCopyId}
-          className="p-1 hover:bg-[var(--chart-background)] dark:hover:bg-[var(--background)] rounded transition"
+          className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition"
           title="Copy ID"
         >
-          <FileIcon className="w-5 h-5 text-[var(--primary)]" />
+          <FileIcon className="w-5 h-5 text-[var(--foreground)" />
         </button>
-        {showCopied && <span className="text-[var(--accent)]">Copied!</span>}
+        {showCopied && (
+          <span className="text-rose-500">Copied!</span>
+        )}
       </div>
+
       {latestVersion && (
-        <div className="
-          inline-flex items-center gap-1
-          bg-[var(--accent)]/10 text-[var(--accent)]
-          px-3 py-1 rounded-full text-sm
-        ">
+        <div className="inline-flex items-center gap-1 bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-sm">
           <ClockIcon className="w-4 h-4" />
           {latestVersion.version}
         </div>
@@ -147,86 +152,47 @@ export default function ResourceDetail() {
     </div>
   </div>
 
-  {/* MIDDLE: Description (full width on mobile) */}
-  <div className="md:col-span-3 lg:col-span-2 text-[var(--foreground)]/90">
+  {/* MIDDLE: Description */}
+  <div className="md:col-span-3 lg:col-span-2 text-[var(--foreground)">
     <p className="text-base">{manifest.description}</p>
   </div>
 
-  {/* RIGHT: Actions */}
-  {/* ─── ACTION BUTTONS (OVERRIDE GLOBAL COLOR) ───────────────────────────────── */}
-<div className="flex flex-wrap gap-4">
-  {/* Download – solid primary bg, black in light / white in dark */}
-  <button
-    onClick={handleDownload}
-    className="
-      inline-flex items-center gap-2
-      bg-[var(--primary)]
-      !text-black dark:!text-white    /* ← override the global accent rule */
-      px-6 py-2
-      rounded-full shadow
-      hover:bg-[var(--primary)]/90
-      transition
-    "
-  >
-    <DownloadIcon className="w-5 h-5 !text-black dark:!text-white" />
-    Download
-  </button>
+  {/* ACTION BUTTONS — full width row, aligned right */}
+  <div className="md:col-span-3 flex justify-end flex-wrap gap-4">
+    <button
+      onClick={handleDownload}
+      className="inline-flex items-center gap-2 bg-rose-100 hover:bg-rose-300 !text-[var(--foreground) px-6 py-2 rounded-full shadow transition"
+    >
+      <DownloadIcon className="w-5 h-5" />
+      Download
+    </button>
 
-  {/* View Source – solid secondary bg, black in light / white in dark */}
-  <button
-    onClick={handleViewSource}
-    className="
-      inline-flex items-center gap-2
-      bg-[var(--secondary)]
-      !text-black dark:!text-white
-      px-6 py-2
-      rounded-full shadow-sm
-      hover:bg-[var(--secondary)]/90
-      transition
-    "
-  >
-    <Link1Icon className="w-5 h-5 !text-black dark:!text-white" />
-    View Source
-  </button>
+    <button
+      onClick={handleViewSource}
+      className="inline-flex items-center gap-2 bg-gray-300 hover:bg-gray-700 !text-[var(--foreground) px-6 py-2 rounded-full shadow-sm transition"
+    >
+      <Link1Icon className="w-5 h-5" />
+      View Source
+    </button>
 
-  {/* Model Tester/Runner – neutral chart-bg, black in light / white in dark */}
-  {manifest.type === 'model' && (
-    <>
-      <button
-        className="
-          px-6 py-2
-          bg-[var(--primary)]
-          !text-black dark:!text-white
-          rounded-full shadow-sm
-          hover:bg-[var(--primary)]/90
-          transition
-        "
-      >
-        Model Tester
-      </button>
-      <button
-        className="
-          px-6 py-2
-          bg-[var(--secondary)]
-          !text-black dark:!text-white
-          rounded-full shadow-sm
-          hover:bg-[var(--secondary)]/90
-          transition
-        "
-      >
-        Model Runner
-      </button>
-    </>
-  )}
+    {manifest.type === 'model' && (
+      <>
+        <button
+          className="px-6 py-2 bg-rose-100 hover:bg-rose-300 !text-[var(--foreground) rounded-full shadow-sm transition"
+        >
+          Model Tester
+        </button>
+        <button
+          className="px-6 py-2 bg-gray-300 hover:bg-gray-700 !text-[var(--foreground) rounded-full shadow-sm transition"
+        >
+          Model Runner
+        </button>
+      </>
+    )}
+  </div>
 </div>
 
 
-
-
-
-
-
-</div>
 
 
 
@@ -266,8 +232,19 @@ export default function ResourceDetail() {
       )}
 
       {/* DOCUMENTATION */}
+      {/* {documentation && (
+        <section className="bg-[var(--chart-background)] rounded-2xl shadow-lg p-6">
+          <div className="prose prose-[var(--foreground)] dark:prose-invert lg:prose-xl">
+            <ReactMarkdown>
+              {documentation}
+            </ReactMarkdown>
+          </div>
+        </section>
+      )} */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 p-4">
+      {/* DOCUMENTATION */}
       {documentation && (
-        <section className="bg-[var(--background)] dark:bg-[var(--chart-background)] rounded-2xl shadow-lg p-6">
+        <section className="bg-[var(--chart-background)] rounded-2xl shadow-lg p-6 md:col-span-8">
           <div className="prose prose-[var(--foreground)] dark:prose-invert lg:prose-xl">
             <ReactMarkdown>
               {documentation}
@@ -276,9 +253,170 @@ export default function ResourceDetail() {
         </section>
       )}
 
+      {/* SIDEBAR */}
+      <div className="md:col-span-4 space-y-6">
+        {/* Versions */}
+        {selectedResource.versions?.length > 0 && (
+          <div className="bg-[var(--chart-background)] dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-semibold mb-4">Versions</h2>
+            <ul className="space-y-4">
+              {[...selectedResource.versions]
+                .reverse()
+                .map((v, i) => (
+                  <li key={v.version} className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <NextLink
+                        href={`/artifacts/${selectedResource.id.split('/').pop()}/${v.version}`}
+                        className="text-sm font-medium hover:underline"
+                      >
+                        {v.version}
+                      </NextLink>
+                      {v.version === latestVersion?.version && (
+                        <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
+                          Latest
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {formatDate(v.created_at)}
+                    </p>
+                    {v.comment && <p className="text-sm">{v.comment}</p>}
+                    {i < selectedResource.versions.length - 1 && (
+                      <hr className="border-gray-200 dark:border-gray-700 my-2" />
+                    )}
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Authors */}
+        {authors.length > 0 && (
+          <div className="bg-[var(--chart-background)] dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center">
+              <PersonIcon className="mr-2" /> Authors
+            </h2>
+            <ul className="space-y-6">
+              {authors.map((a, i) => (
+                <li key={i} className="space-y-1">
+                  <p className="font-medium">{a.name}</p>
+                  {a.orcid && (
+                    <NextLink
+                      href={`https://orcid.org/${a.orcid}`}
+                      target="_blank"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      ORCID: {a.orcid}
+                    </NextLink>
+                  )}
+                  {a.affiliation && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                      <IdCardIcon className="mr-1" />
+                      {a.affiliation}
+                    </p>
+                  )}
+                  {i < authors.length - 1 && (
+                    <hr className="border-gray-200 dark:border-gray-700 my-2" />
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Statistics */}
+        <div className="bg-[var(--chart-background)] rounded-2xl shadow-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">Statistics</h2>
+          <div className="flex flex-col gap-3">
+            <span className="inline-flex items-center text-sm px-3 py-1 rounded-full bg-[var(--accent)]/20 text-[var(--accent)]">
+              <DownloadIcon className="mr-2" />
+              Downloads: {selectedResource.download_count}
+            </span>
+            <span className="inline-flex items-center text-sm px-3 py-1 rounded-full bg-[var(--accent)]/20 text-[var(--accent)]">
+              <EyeOpenIcon className="mr-2" />
+              Views: {selectedResource.view_count}
+            </span>
+          </div>
+        </div>
+
+        {/* Citations */}
+        {cite.length > 0 && (
+          <div className="bg-[var(--chart-background)] dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-semibold mb-4">Citations</h2>
+            <ul className="space-y-4">
+              {cite.map((c, i) => (
+                <li key={i} className="space-y-1">
+                  <p className="text-sm">{c.text}</p>
+                  {c.doi && (
+                    <NextLink
+                      href={`https://doi.org/${c.doi}`}
+                      target="_blank"
+                      className="text-xs text-blue-600 hover:underline"
+                    >
+                      DOI: {c.doi}
+                    </NextLink>
+                  )}
+                  {i < cite.length - 1 && (
+                    <hr className="border-gray-200 dark:border-gray-700 my-2" />
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="bg-[var(--chart-background)] dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center">
+              <DrawingPinFilledIcon className="mr-2" /> Tags
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="text-sm bg-[var(--accent)]/20 text-[var(--accent)] px-2 py-0.5 rounded-full"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Links */}
+        {manifest.git_repo && (
+          <div className="bg-[var(--chart-background)] rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center">
+              <Link1Icon className="mr-2" /> Links
+            </h2>
+            <ul className="space-y-2">
+              <li>
+                <NextLink
+                  href={manifest.git_repo}
+                  target="_blank"
+                  className="text-sm hover:underline"
+                >
+                  GitHub Repository
+                </NextLink>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* License */}
+        {manifest.license && (
+          <div className="bg-[var(--chart-background)] rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-semibold mb-2">License</h2>
+            <p className="text-sm">{manifest.license}</p>
+          </div>
+        )}
+      </div>
+    </div>
+
       {/* RDF DIALOG */}
       {isRdfDialogOpen && (
-        <dialog open className="fixed inset-0 m-auto w-11/12 max-w-lg p-6 bg-[var(--background)] dark:bg-[var(--chart-background)] rounded-2xl shadow-2xl">
+        <dialog open className="fixed inset-0 m-auto w-11/12 max-w-lg p-6 bg-[var(--chart-background)] rounded-2xl shadow-2xl">
           <button onClick={() => setIsRdfDialogOpen(false)}
                   className="absolute top-4 right-4 p-1 rounded-full hover:bg-[var(--chart-background)] transition">
             <Cross2Icon className="w-5 h-5 text-[var(--secondary)]" />

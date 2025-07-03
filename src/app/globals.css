@@ -16,7 +16,7 @@
 /* 2. Dark theme (on <html class="dark">) */
 /* ———————————————————— */
 html.dark {
-  --background:  #1E3A8A;   /* Navy  */
+  --background:  #3B82F6;   
   --foreground:  #F2F2F2;   /* Off-white for legibility */
   --accent:      #C10F3A;   /* Keep CTAs in St. Jude Red */
   --primary:     #1874DC;   /* Cloud Blue still available */
@@ -37,14 +37,6 @@ body {
 a, button {
   color: var(--accent);
 }
-/* @layer components {
-  button {
-    color: var(--color-yellow-300) !important;
-  }
-  html.dark button {
-    color: white !important;
-  }
-} */
 
 
 /* You can also use var(--primary)/var(--secondary) in your Tailwind config */
