@@ -30,6 +30,7 @@ export const ArtifactCard: React.FC<ArtifactCardProps> = ({ artifact }) => {
   // 2) Destructure and normalize tags
   const { manifest, download_count, view_count, created_at } = artifact;
   const tags = manifest.tags ?? [];
+
   const uniqueTags = Array.from(new Set(tags));
   const createdDate = new Date(created_at).toLocaleDateString();
 

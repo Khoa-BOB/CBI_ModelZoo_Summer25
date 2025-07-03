@@ -61,13 +61,13 @@ export default function SideBar() {
   return (
     <NavigationMenu.Root
       orientation="vertical"
-      className={`
-        fixed top-0 left-0 h-screen z-40
-        w-20 group-hover:w-56 transition-all duration-300 ease-out
+      className="
+        peer group fixed top-0 left-0 h-screen z-40
+        w-20 hover:w-56 transition-all duration-300 ease-out
         bg-gray-900 dark:bg-gray-900 shadow-lg rounded-tr-3xl rounded-br-3xl
-        flex flex-col items-center py-6 group-hover:items-start group-hover:px-4
+        flex flex-col items-center py-6 hover:items-start hover:px-4
         overflow-hidden
-        `}
+      "
     >
       <NavigationMenu.List className="flex flex-col gap-2 w-full">
         {([
